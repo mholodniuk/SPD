@@ -1,16 +1,7 @@
-from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
 
-@dataclass
-class Task:
-    release_time: int
-    execution_time: int
-
-@dataclass
-class Dataset:
-    id: str
-    tasks: list[Task]
+from utils.models import Dataset, Task
 
 
 def calculate_total_execution_time(task_dataset: Dataset) -> tuple[str, int]:
@@ -27,7 +18,7 @@ def sort_by_release_time(tasks: list[Task]) -> list[Task]:
 
 
 
-def read_data_from_files(path_str: str) -> list[Dataset]:
+def read_data_from_directory(path_str: str) -> list[Dataset]:
     files = [item.absolute() for item in Path(path_str).iterdir() if item.is_file()]
     data = []
     for file in files:
@@ -45,5 +36,5 @@ def create_tasks_from_tuple_list(task_list: list[tuple[int, int]]) -> list[Task]
     return [Task(raw_task_data[0], raw_task_data[1]) for raw_task_data in task_list]
 
 
-for tasks in read_data_from_files('./data'):
+for tasks in read_data_from_directory('./data'):
     print(calculate_total_execution_time(tasks))
