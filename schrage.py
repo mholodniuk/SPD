@@ -1,27 +1,29 @@
-from shared import Algorithm, Dataset, Scheduler, read_data_from_files
+from shared import Algorithm, Dataset, read_data_from_files
+from shared.algorithm import Scheduler
 
 
 class SchrageAlgorithm(Algorithm):
     def run(self, dataset: Dataset) -> tuple[str, int]:
         tasks = dataset.tasks
-        ready_queue = list()
-        task_list = sorted(tasks, key=lambda x: x.release_time)
-        current_time, Cmax = task_list[0].release_time, 0
-
-        while ready_queue or task_list:
-            while task_list and task_list[0].release_time <= current_time:
-                ready_queue.append(task_list.pop(0))
-
+        sorted_tasks = sorted(tasks, key=lambda t: t.release_time)
+        ready_queue, schedule = [], []
+        time, cmax = 0, 0
+        
+        while ready_queue or sorted_tasks:
+            while sorted_tasks and sorted_tasks[0].release_time <= time:
+                ready_queue.append(sorted_tasks.pop(0))
+            
             if not ready_queue:
-                current_time = task_list[0].release_time
-            else:
-                task = max(ready_queue, key=lambda task: task.delivery_time)
-                ready_queue.remove(task)
-                current_time += task.processing_time
-                Cmax = max(Cmax, current_time + task.delivery_time)
-
-        return (dataset.id, Cmax)
-
+                time = sorted_tasks[0].release_time
+                continue
+            
+            task = max(ready_queue, key=lambda t: t.delivery_time)
+            ready_queue.remove(task)
+            schedule.append(task)
+            time += task.processing_time
+            cmax = max(cmax, time + task.delivery_time)
+        
+        return (dataset.id, cmax)
 
 for tasks in read_data_from_files('./schrage/data'):
     scheduler = Scheduler(tasks)
