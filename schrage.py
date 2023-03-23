@@ -10,23 +10,24 @@ class SchrageAlgorithm(Algorithm):
         sorted_tasks = sorted(tasks, key=lambda t: t.release_time)
         ready_queue, schedule = [], []
         time, cmax = 0, 0
-        
+
         while ready_queue or sorted_tasks:
             while sorted_tasks and sorted_tasks[0].release_time <= time:
                 ready_queue.append(sorted_tasks.pop(0))
-            
+
             if not ready_queue:
                 time = sorted_tasks[0].release_time
                 continue
-            
+
             task = max(ready_queue, key=lambda t: t.delivery_time)
             ready_queue.remove(task)
             schedule.append(task)
             time += task.processing_time
             cmax = max(cmax, time + task.delivery_time)
-        
+
         return (dataset.id, cmax)
-    
+
+
 class SchragePMTNlgorithm(Algorithm):
     def run(self, dataset: Dataset) -> int:
         tasks = dataset.tasks
@@ -45,7 +46,8 @@ class SchragePMTNlgorithm(Algorithm):
                     if l.processing_time > 0:
                         ready.append(l)
             if not ready:
-                current_time = min(not_ready, key=lambda task: task.release_time).release_time
+                current_time = min(
+                    not_ready, key=lambda task: task.release_time).release_time
             else:
                 task = max(ready, key=lambda task: task.delivery_time)
                 ready.remove(task)
@@ -53,7 +55,6 @@ class SchragePMTNlgorithm(Algorithm):
                 current_time += task.processing_time
                 cmax = max(cmax, current_time + task.delivery_time)
         return (dataset.id, cmax)
-
 
 
 print('bez podziału')
